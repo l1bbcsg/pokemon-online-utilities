@@ -1,0 +1,6 @@
+<category displayOrder="0">
+	<category displayOrder="1" name="Battle Factory">
+		<tier pokemons="" restrictedPokemons="" tableName="tier_factory" banMode="ban" maxLevel="50" mode="1" displayOrder="0" gen="5" moves="" items="" banParent="" name="Battle Factory" numberOfPokemons="3" numberOfRestricted="" clauses="Species Clause"/>
+		<tier pokemons="" restrictedPokemons="" tableName="tier_by" banMode="ban" maxLevel="50" mode="1" displayOrder="0" gen="5" moves="" items="" banParent="" name="Main Hall" numberOfPokemons="3" numberOfRestricted="" clauses="Species Clause"/>
+	</category>
+</category>

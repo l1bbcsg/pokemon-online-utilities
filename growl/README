@@ -1,0 +1,2 @@
+XMPP MUC <-> PO channel message retranslator
+twistd -y growl.tac to launch

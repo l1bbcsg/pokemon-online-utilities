@@ -1,0 +1,10 @@
+Various scripts and utilities
+
+Battle Factory script 
+	PO server script handling Battle-Factory like game
+
+Growl
+	Bot that send messages from XMPP MUC to PO channel and vice-versa
+
+MyIsam stats converter
+	Converts PO binary statistics to MySQL database
