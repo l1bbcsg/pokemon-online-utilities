@@ -246,11 +246,11 @@ class PODecoder(object):
         return struct.pack("!bhhhhh", color.color_spec, color.alpha, color.red, color.green, color.blue, color.pad)
 
     def encode_ChallengeInfo(self, info):
-        print "info"
-        print info.dsc
-        print info.opp
-        print info.clauses
-        print info.mode
+#        print "info"
+#        print info.dsc
+#        print info.opp
+#        print info.clauses
+#        print info.mode
         return struct.pack("!biIB", info.dsc, info.opp, info.clauses, info.mode)
 
     def encode_BattleChoice(self, choice):
@@ -306,7 +306,7 @@ class POProtocol(Int16StringReceiver, PODecoder):
         ev = struct.unpack("B", cmd[:1])[0] 
         cmd = cmd[1:]
         evname = EventNames[ev] if 0 <= ev <= len(EventNames) else None
-        if self.printEvents:	print 'EVENT', evname
+        if self.printEvents:    print 'EVENT', evname
         if evname is None:
             self.on_ProtocolError(ev, cmd)
         if hasattr(self, "on_"+evname):
@@ -405,8 +405,10 @@ class POProtocol(Int16StringReceiver, PODecoder):
     def handleBattleCommand(self, battleid, bytes):
         msgnro, i = self.decode_number(bytes, 0, "B")
         spot, i = self.decode_number(bytes, i, "B")
-        if msgnro in BattleCommands:
-            name = BattleCommands[msgnro]
+        #print 'Battle command, id:', msgnro
+        if msgnro in BattleCommands.values():
+            name = BattleCommandNames[msgnro]
+            if (self.printEvents):    print 'Battle command name:', name
             if hasattr(self, "on_Battle_"+name):
                 getattr(self, "on_Battle_"+name)(battleid, spot, bytes[i:])
             else:
@@ -696,28 +698,60 @@ class POProtocol(Int16StringReceiver, PODecoder):
         """
         AbsStatusChange
         """
+    
+    ###### OWN
+    def on_Battle_Rated(self, bid, spot, bytes):
+        rated, i = self.decode_number(bytes, 0, "B")
+        self.onBattleRated(bid, spot, not not rated)
+        
+    def onBattleRated(self, bid, spot, rated):
+        """
+        Tells whether the battle mode is rated or not
+        """
 
-    def on_Battle_Substitute(self, bid, spot, bytes):	pass
-    def on_Battle_BattleEnd(self, bid, spot, bytes):	pass
-    def on_Battle_BlankMessage(self, bid, spot, bytes):	pass
-    def on_Battle_CancelMove(self, bid, spot, bytes):	pass
-    def on_Battle_Clause (self, bid, spot, bytes):	pass
-    def on_Battle_DynamicInfo (self, bid, spot, bytes):	pass
-    def on_Battle_DynamicStats (self, bid, spot, bytes):	pass
-    def on_Battle_Spectating(self, bid, spot, bytes):	pass
-    def on_Battle_SpectatorChat(self, bid, spot, bytes):	pass
-    def on_Battle_AlreadyStatusMessage(self, bid, spot, bytes):	pass
-    def on_Battle_TempPokeChange(self, bid, spot, bytes):	pass
-    def on_Battle_ClockStart (self, bid, spot, bytes):	pass
-    def on_Battle_ClocakStop (self, bid, spot, bytes):	pass
-    def on_Battle_Rated(self, bid, spot, bytes):	pass
-    def on_Battle_TierSection (self, bid, spot, bytes):	pass
-    def on_Battle_EndMessage(self, bid, spot, bytes):	pass
-    def on_Battle_PointEstimate(self, bid, spot, bytes):	pass
-    def on_Battle_MakeYourChoice(self, bid, spot, bytes):	pass
-    def on_Battle_Avoid(self, bid, spot, bytes):	pass
-    def on_Battle_RearrangeTeam(self, bid, spot, bytes):	pass
-    def on_Battle_SpotShifts(self, bid, spot, bytes):	pass
+    def on_Battle_TierSection (self, bid, spot, bytes):
+        tier, i = self.decode_string(bytes, 0)
+        self.onBattleTier(bid, spot, tier)
+
+    def onBattleTier(self, bid, spot, tier):
+        """
+        Battle Tier message
+        """
+    
+    def on_Battle_BlankMessage(self, bid, spot, bytes):
+        self.onBattleBlankMessage(bid, spot)
+        
+    def onBattleBlankMessage(self, bid, spot):
+        """
+        Blank Message at the beginning of the battle
+        """
+    
+    def on_Battle_AlreadyStatusMessage(self, bid, spot, bytes):
+        status, i = self.decode_number(bytes, 0, "b")
+        self.onBattleAlreadyHasStatus(self, bid, spot, status)
+        
+    def onBattleAlreadyHasStatus(self, bid, spot, oldstatus):   # _todo_ oldstatus -id or message id?
+        """
+        When trying to inflict status ailment to a Pokemon that already has one.
+        """
+    
+    def on_Battle_Clause (self, bid, spot, bytes):    pass
+    def on_Battle_BattleEnd(self, bid, spot, bytes):    pass
+    def on_Battle_Substitute(self, bid, spot, bytes):    pass
+    def on_Battle_CancelMove(self, bid, spot, bytes):    pass
+    def on_Battle_DynamicInfo (self, bid, spot, bytes):    pass
+    def on_Battle_DynamicStats (self, bid, spot, bytes):    pass
+    def on_Battle_Spectating(self, bid, spot, bytes):    pass
+    def on_Battle_SpectatorChat(self, bid, spot, bytes):    pass
+    def on_Battle_TempPokeChange(self, bid, spot, bytes):    pass
+    def on_Battle_ClockStart (self, bid, spot, bytes):    pass
+    def on_Battle_ClockStop (self, bid, spot, bytes):    pass
+    def on_Battle_EndMessage(self, bid, spot, bytes):    pass
+    def on_Battle_PointEstimate(self, bid, spot, bytes):    pass
+    def on_Battle_MakeYourChoice(self, bid, spot, bytes):    pass
+    def on_Battle_Avoid(self, bid, spot, bytes):    pass
+    def on_Battle_RearrangeTeam(self, bid, spot, bytes):    pass
+    def on_Battle_SpotShifts(self, bid, spot, bytes):    pass
 
 
     ### Events from connecting to server
