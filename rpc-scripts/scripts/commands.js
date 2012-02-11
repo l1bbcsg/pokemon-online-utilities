@@ -136,4 +136,15 @@ Commands.add('commands', access.user, 'Показывает все доступ�
 	Utils.message(user, msg);
 });
 
+Commands.add('topic', access.moderator, 'Изменяет тему в заголовке сервера.', function(user, param) {
+	var separator = '<!--separator-->';
+	var header =  sys.getAnnouncement().split(separator)[0];
+	sys.setAnnouncement(header + separator + param);
+	Utils.messageAll(sys.name(user) + ' изменил тему.');
+});
+
+Commands.add('me', access.user, 'Сообщение в третьем лице.', function(user, param) {
+	Utils.messageAll('<b style="color: ' +sys.getColor(user)+ '">***' + sys.name(user) + '</b> ' + param);
+});
+
 Commands // eval will return this
