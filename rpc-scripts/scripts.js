@@ -1,7 +1,8 @@
 // Russian Pokemon Community PO scripts
-// Версия 2.0.b; Рассчитано на PO 1.0.53
-// Questions can be asked in pokeworld@pokecenter.ru conference
+// Версия 2.1.0; Рассчитано на PO 1.0.53
+// Questions can be asked in pokeworld@conference.pokecenter.ru 
 
+SESSION.identifyScriptAs('RPCv2.1');
 
 var ipinfo_api_key   = sys.getVal('api.txt', 'ipinfo');
 var pastebin_api_key = sys.getVal('api.txt', 'pastebin');
@@ -18,39 +19,38 @@ var Utils      = sys.require('utils.js');
 var Commands   = sys.require('commands.js');
 var TierFilter = sys.require('tierfilter.js');
 var User       = sys.require('user.js');
+var Storage    = sys.require('storage.js');
 
 SESSION.registerUserFactory(User);
 
-var TempBans = {};	// может течь если юзер не возвращается после того как забанен.
-var storedBans = sys.getFileContent('tempbans.txt');
-for (var entry in storedBans) {
-	var a = entry.split('@');
-	TempBans[a[0]] = 1 * a[1];
-};
+var TempBans = new Storage('tempbans.txt');
+var Mutes    = new Storage('mutes.txt');
 
 
 ({
 	beforeLogIn: function(id) {
 		var ip = sys.ip(id);
-		
+		/*
 		if (sys.auth(id) > 0 || ip== '127.0.0.1' )
-			return;
+			return;*/
 
-		if (ip in TempBans) {
-			var time = (new Date()).getTime();
-			if (time > TempBans[ip])
-				delete TempBans[ip];
+		var ban = TempBans.get(ip);
+		if (ban)
+			if ((new Date()).getTime() > ban)
+				TempBans.remove(ip);
 			else {
-				var prettytime = (time - TempBans[ip]) + ' секунд. Да-да, считайте сами.';	// _todo_ 
-				Utils.message(id, 'Ваш бан ещё не истёк. Осталось ' + prettytime);
+				Utils.message(id, 'Ваш бан ещё не истёк. Осталось ' + Utils.Time.pretty(Utils.Time.parseEpoch(ban)));
 				sys.stopEvent();
 				return;
 			}
-		};
-		
+	
 		sys.webCall('http://api.ipinfodb.com/v3/ip-country/?key='+ipinfo_api_key +'&ip='+ip+'&format=json', function(resp) {
+			if (!sys.name(id))	// in case they left already
+				return;
 			var o = JSON.parse(resp);
-			Utils.messageAll(sys.name(id)+' пришел к нам из '+ o.countryName.toLowerCase().replace(/^([a-z])|\s+([a-z])/g, function ($1) {return $1.toUpperCase()}));
+			var country = o.countryName.toLowerCase().replace(/^([a-z])|\s+([a-z])/g, function ($1) {return $1.toUpperCase()})
+			Utils.messageAll(sys.name(id)+' пришел к нам из '+ country);
+			SESSION.users(id).country = country;
 			if (-1 == ["RU", "UA", "BY", "KZ", "EE", 'AZ'].indexOf(o.countryCode))
 				Utils.message(id, 'You don\'t seem to speak Russian, we suggest you finding another server.\nЕсли вы вы считаете, что видите это по ошибке, сообщите администрации, желательно указав свою страну и ip адрес.');
 		});
@@ -74,11 +74,16 @@ for (var entry in storedBans) {
 	},
 	
 	beforeChatMessage: function(pid, msg) {
-		if (SESSION.users(pid).muted) {
-			sys.stopEvent();
-			return;
-		}
-		
+		var ip = sys.ip(pid);
+		var mute = Mutes.get(ip);
+		if (mute)
+			if ((new Date()).getTime() > mute)
+				Mutes.remove(ip);
+			else {
+				Utils.message(pid, 'Вы лишены голоса. Осталось ' + Utils.Time.pretty(Utils.Time.parseEpoch(mute)));
+				sys.stopEvent();
+				return;
+			}
 		if (msg[0] == '/' && msg.length > 1 && msg[1] != msg[0]) {
 			sys.stopEvent();
 			var a = msg.split(' ');
@@ -90,5 +95,10 @@ for (var entry in storedBans) {
 			else
 				Utils.message(pid, 'Нет такой команды "' +command+ '".');
 		}
-	}
+	},
+	
+	serverShutDown: function() {
+		Mutes.dump();
+		TempBans.dump();
+	},
 });

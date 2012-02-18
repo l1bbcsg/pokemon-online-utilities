@@ -1,8 +1,6 @@
 function User(id) {
 	this.id = id;
-	this.muted = false;
+	this.country = undefined;
 }
-
-User.prototype.foo = 'bar';
 
 User // for eval

@@ -111,6 +111,21 @@ TierFilter.add(['Красный Октябрь'], function(pid) {
 	return ret;
 });
 
+	// Blaziken + Speed Boost + Swords Dance
+TierFilter.add(['Третий Межсайтовый', 'Февральский Турнир'], function(pid) {
+	var ret = [];
+
+	for (var slot = 0; slot<6; slot++)
+		if (sys.teamPoke(pid, slot) == sys.pokeNum('Blaziken') 
+		 && sys.teamPokeAbility(pid, slot) == sys.abilityNum('Speed Boost')
+		 && sys.indexOfTeamPokeMove(pid, slot, sys.moveNum('Swords Dance')) !== undefined)
+			ret.push('Blaziken со Speed Boost и Swords Dance запрещён в этом турнире');
+
+	return ret;
+});
+
+
+	// Shadow Tag && Moody
 TierFilter.add(['Третий Межсайтовый', 'Февральский Турнир'], function(pid) {
 	var ret = [];
 	var bannedAbilities = [sys.abilityNum('Shadow Tag'), sys.abilityNum('Moody')];
@@ -120,46 +135,59 @@ TierFilter.add(['Третий Межсайтовый', 'Февральский �
 			ret.push(sys.teamPokeNick(pid, slot) + " имеет способность "+sys.ability(sys.teamPokeAbility(pid, slot))+", которая запрещена в турнире.");
 	}
 	
-	var blaziken = sys.pokeNum('Blaziken');
-
-	var num = sys.indexOfTeamPoke(pid, blaziken);
-	
-	if (num !== undefined
-	&&  sys.indexOfTeamPokeMove(pid, num, sys.moveNum('Swords Dance')) !== undefined 
-	&&  sys.teamPokeAbility(pid, num) == sys.abilityNum('Speed Boost'))
-		ret.push('Blaziken со Speed Boost и Swords Dance запрещён в этом турнире');
-	
 	return ret;
 });
 
-	// Комбо Swift Swim + Drizzle & Chlorophyll + Drought
+	// Комбо Swift Swim + Drizzle
 TierFilter.add(['Февральский Турнир'], function(pid) {
-	var Drizzle    = sys.abilityNum('Drizzle'),
-		Drought    = sys.abilityNum('Drought'),
-		SwiftSwim  = sys.abilityNum('Swift Swim'),
-		Chlorophyll = sys.abilityNum('Chlorophyll');
-	
-	var check = {}
-	check[Drizzle] = false;
-	check[Drought] = false;
-	check[SwiftSwim]  = false;
-	check[Chlorophyll] = false;
+	var Drizzle     = false,
+		SwiftSwim = false;
 
 	var ret = [];
 	
 	for (var slot = 0; slot<6; slot++) {
 		var ability = sys.teamPokeAbility(pid, slot);
-		if (check.hasOwnProperty(ability))
-			check[ability] = true;
+		if (ability == sys.abilityNum('Drizzle'))
+			Drizzle = true;
+		else if (ability == sys.abilityNum('Swift Swim'))
+			SwiftSwim = true;
 	}
 	
-	if (check[Drought] && check[Chlorophyll])
-		ret.push('Комбо Drought и Chlorophyll запрещено в этом турнире.');
-	
-
-	if (check[Drizzle] && check[SwiftSwim])
+	if (Drizzle && SwiftSwim)
 		ret.push('Комбо Drizzle и Swift Swim запрещено в этом турнире.');
 		
+	return ret;
+});
+
+	// Комбо Chlorophyll + Drought
+TierFilter.add(['Февральский Турнир'], function(pid) {
+	var Drought     = false,
+		Chlorophyll = false;
+
+	var ret = [];
+	
+	for (var slot = 0; slot<6; slot++) {
+		var ability = sys.teamPokeAbility(pid, slot);
+		if (ability == sys.abilityNum('Drought'))
+			Drought = true;
+		else if (ability == sys.abilityNum('Chlorophyll'))
+			Chlorophyll = true;
+	}
+	
+	if (Drought && Chlorophyll)
+		ret.push('Комбо Drought и Chlorophyll запрещено в этом турнире.');
+		
+	return ret;
+});
+
+	// Excadrill + Sand Rush
+TierFilter.add(['Февральский Турнир'], function(pid) {
+	var ret = [];
+
+	for (var slot = 0; slot<6; slot++)
+		if (sys.teamPoke(pid, slot) == sys.pokeNum('Excadrill') && sys.teamPokeAbility(pid, slot) == sys.abilityNum('Sand Rush'))
+			ret.push('Excadrill с Sand Rush и запрещён в этом турнире');
+	
 	return ret;
 });
 

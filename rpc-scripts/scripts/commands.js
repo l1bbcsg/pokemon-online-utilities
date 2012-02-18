@@ -39,28 +39,52 @@ Commands.add('eval', access.owner, 'Evaluates passed code', function(user, code)
 		Utils.message(user, 'Команда вернула: ' + res);
 });
 
-Commands.add('mute', access.moderator, 'Лишает пользователя голоса.', function(mod, targetName) {
+Commands.add('mute', access.moderator, 'Лишает пользователя голоса.', function(mod, param) {
+	var maxMute = 24 * 60 * 60 * 1000;	// день
+	var defMute = 60 * 60 * 1000;	// минута
+	var time = defMute;
+	
+	var a = param.split(' ');
+	var targetName = a[0];
 	var target = sys.id(targetName);
-	SESSION.users(target).muted = true;
-	Utils.message(target, sys.name(mod) + ' лишил вас голоса.');
-	Utils.message(mod, targetName + ' лишен голоса.');
+	
+	if (!target) {
+		Utils.message(mod, 'Нет такого пользователя "' +targetName+ '".');
+		return;
+	}
+	
+	if (a.length>1)
+		try {
+			time = Utils.Time.parseString(a.slice(1).join(' '));
+		}
+		catch (e) {
+			Utils.message(mod, e);
+		}
+	
+	var ms = Utils.Time.milliseconds(time);
+	if (ms > maxMute)
+		ms = maxMute;
+	
+	var ip = sys.ip(target);
+	Mutes.add(ip, (new Date()).getTime() + ms);
+	
+	var prettytime = Utils.Time.pretty(time);
+	Utils.message(target, sys.name(mod) + ' лишил вас голоса на ' + prettytime);
+	Utils.message(mod, targetName + '(' +ip+ ') лишён голоса на ' + prettytime);
 });
 
-Commands.add('unmute', access.moderator, 'Возвращает голос пользователю.', function(mod, targetName) {
-	var target = sys.id(targetName);
-	SESSION.users(target).muted = false;
+Commands.add('unmute', access.moderator, 'Возвращает голос пользователю (требуется ip).', function(mod, ip) {
+	Mutes.remove(ip);
 	Utils.message(target, sys.name(mod) + ' + вернул вам голос.');
-	Utils.message(mod, targetName + ' снова имеет голос.');
+	Utils.message(mod, ip + ' снова имеет голос.');
 });
 
 Commands.add('tempban', access.moderator, 'Банит пользователя на некоторое время.', function(mod, param) {
-	var time   = {d: 0, h: 0, m: 0};
-	var maxBan = {d: 7, h: 0, m: 0};	var maxminutes = 7 * 24 * 60;
-	var defBan = {d: 0, h: 1, m: 0};
+	var maxBan = 07 * 24 * 60 * 60;	// неделя
+	var defBan = 60 * 60 * 60;	// час
+	var time   = defBan;
 	
-	var parsingFailed = false;
-	
-	var a = param.split(' ')
+	var a = param.split(' ');
 	var targetName = a[0];
 	var target = sys.id(targetName);
 	
@@ -68,47 +92,32 @@ Commands.add('tempban', access.moderator, 'Банит пользователя �
 		Utils.message(mod, 'Эээ, некого банить.');
 		return;
 	}
-
-	if (a.length == 1)
-		time = defBan;
-	else {
-		a = a.slice(1)
-		for (var i in a) {
-			var res = a[i].match(/^(\d+)([dhm])$/i);
-			if (!res) {
-				// throw ...
-				parsingFailed = true;
-				break;
-			}
-			else
-				time[ res[2] ] = 1* res[1];
-		}
-	}
 	
-	if (parsingFailed) {
-		Utils.message(mod, 'Неверно задан формат: ' + a[i]);
-	}
-	else {
-		var minutes = time.m + time.h * 60 + time.d * 60 * 24;
-		if (minutes > maxminutes) {
-			minutes = maxminutes;
-			time = maxBan;
+	if (a.length>1)
+		try {
+			time = Utils.Time.parseString(a.slice(1).join(' '));
 		}
-		TempBans[sys.ip(target)] = (new Date()).getTime() + minutes * 60;
-		var prettytime = (time.d? time.d + ' дн. ' :'') + (time.h? time.h + ' час. ' :'') + (time.m? time.m + ' мин. ' :'');
-		Utils.message(target, sys.name(mod) + ' забанил вас на ' + prettytime);
-		Utils.message(mod, targetName + ' забанен на ' + prettytime);
-		sys.kick(target);
-	}
+		catch (e) {
+			Utils.message(mod, e);
+		}
+	
+	
+	var ms = Utils.Time.milliseconds(time);
+	if (ms > maxBan)
+		ms = maxBan;
+	
+	var ip = sys.ip(target);
+	TempBans.add(ip, (new Date()).getTime() + ms);
+	
+	var prettytime = Utils.Time.pretty(time);
+	Utils.message(target, sys.name(mod) + ' забанил вас на ' + prettytime);
+	Utils.message(mod, targetName + '(' +ip+ ') забанен на ' + prettytime);
+	sys.kick(target);
 });
 
-Commands.add('tempban', access.moderator, 'Разбанивает пользователя. (требуется ip)', function(mod, ip) {
-	if (ip in TempBans) {
-		delete TempBans[ip];
-		Utils.message(mod, ip + ' Разбанен.');
-	}
-	else 
-		Utils.message(mod, ip + ' не забанен. Забанить?');
+Commands.add('untempban', access.moderator, 'Разбанивает пользователя. (требуется ip)', function(mod, ip) {
+	TempBans.remove(ip)
+	Utils.message(mod, ip + ' разбанен.');
 });
 
 Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с указанного урла.', function(user, param) {
@@ -123,7 +132,44 @@ Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с ук�
 	return;
 });
 
-// _todo_ updatescripts
+Commands.add('updatescripts', access.owner, 'Обновляет все модули скриптов.', function(user) {
+	//Utils.message(user, "Загружаю...");
+	var urlPrefix = "http://kalashnikov.pokecenter.ru/res/po/";
+	
+	var modules = ['utils', 'storage', 'commands', 'tierfilter', 'user'];
+	var toUpdate = modules.length;
+	
+	for (var i=0; i<module.length; i++) {
+		var url  = urlPrefix + 'scripts/' + modules[i] + '.js';
+		var path = 'scripts/' + modules[i] + '.js';
+		
+		sys.writeToFile(path + '.bckp', sys.getFileContent(path) );
+		
+		sys.webCall(url, function(resp) {
+			sys.writeToFile(path, resp);
+			if (--toUpdate == 0)
+				reload();
+		});
+	}
+	
+	function reload() {
+		sys.writeToFile('scripts.js.bckp', sys.getFileContent('scripts.js') );
+		sys.webCall(urlPrefix + 'scripts.js', function(resp) {
+			if (!resp)
+				return;
+			try {
+				sys.changeScript(resp);
+				sys.writeToFile('scripts.js', resp);
+			} catch (err) {
+				Utils.message(user, "Ошибка: " + err);
+				print(err);
+				
+				sys.changeScript(sys.getFileContent('scripts.js.bckp'));
+				sys.writeToFile('scripts.js', sys.getFileContent('scripts.js.bckp') );
+			}
+		});
+	}
+});
 
 Commands.add('commands', access.user, 'Показывает все доступные команды.', function(user, param) {	// вся "инкапсуляция" к чертям (
 	var msg = '<dl>';	// _todo_ prettier html
@@ -139,7 +185,7 @@ Commands.add('commands', access.user, 'Показывает все доступ�
 Commands.add('topic', access.moderator, 'Изменяет тему в заголовке сервера.', function(user, param) {
 	var separator = '<!--separator-->';
 	var header =  sys.getAnnouncement().split(separator)[0];
-	sys.setAnnouncement(header + separator + param);
+	sys.changeAnnouncement(header + separator + param);
 	Utils.messageAll(sys.name(user) + ' изменил тему.');
 });
 
