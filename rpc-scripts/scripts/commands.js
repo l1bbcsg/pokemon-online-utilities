@@ -122,7 +122,7 @@ Commands.add('untempban', access.moderator, 'Разбанивает пользо
 
 Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с указанного урла.', function(user, param) {
 	//Utils.message(user, "Загружаю...");
-	var updateURL = "http://kalashnikov.pokecenter.ru/res/po/tiers.xml";
+	var updateURL = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/tiers.xml";
 	if (param !== undefined && param.substring(0,7) == 'http://')
 		updateURL = param;
 	
@@ -134,8 +134,8 @@ Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с ук�
 
 Commands.add('updatescripts', access.owner, 'Обновляет все модули скриптов.', function(user) {
 	//Utils.message(user, "Загружаю...");
-	//var urlPrefix = "http://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/";
-	var urlPrefix = "file:///home/ilya/projects/pokemon-online-utilities/rpc-scripts/";
+	var urlPrefix = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/";
+	//var urlPrefix = "file:///home/ilya/projects/pokemon-online-utilities/rpc-scripts/";
 	
 	var modules = ['utils', 'storage', 'commands', 'tierfilter', 'user'];
 	var toUpdate = modules.length;
