@@ -43,7 +43,7 @@ var TierFilter = {
 		}
 	},
 	findAppropriateTier: function(pid) {
-		var queue = ['Wifi NU', 'Wifi LU', 'Wifi UU', 'Wifi OU', 'DW OU', 'Wifi Ubers', 'DW Ubers', 'Challenge Cup'];
+		var queue = ['Wifi UU', 'DW UU', 'Wifi OU', 'DW OU', 'Wifi Ubers', 'DW Ubers', 'Challenge Cup'];
 		for (var i = 0; i<queue.length; i++) {
 			if (sys.hasLegalTeamForTier(pid, queue[i]) 
 				&& !TierFilter.exists[queue[i]] 
@@ -80,7 +80,7 @@ TierFilter.add(['Monotype'], function(pid) {
 
 	return [];
 });
-
+/*
 TierFilter.add(['Красный Октябрь'], function(pid) {
 	var ret = [];
 	var slot = sys.indexOfTeamPoke(src, sys.pokeNum('Blaziken'));
@@ -123,7 +123,7 @@ TierFilter.add(['Третий Межсайтовый', 'Февральский �
 
 	return ret;
 });
-
+*/
 
 	// Shadow Tag && Moody
 TierFilter.add(['Третий Межсайтовый', 'Февральский Турнир'], function(pid) {
