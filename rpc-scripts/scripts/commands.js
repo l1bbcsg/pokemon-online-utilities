@@ -134,22 +134,26 @@ Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с ук�
 
 Commands.add('updatescripts', access.owner, 'Обновляет все модули скриптов.', function(user) {
 	//Utils.message(user, "Загружаю...");
-	var urlPrefix = "http://kalashnikov.pokecenter.ru/res/po/";
+	//var urlPrefix = "http://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/";
+	var urlPrefix = "file:///home/ilya/projects/pokemon-online-utilities/rpc-scripts/";
 	
 	var modules = ['utils', 'storage', 'commands', 'tierfilter', 'user'];
 	var toUpdate = modules.length;
 	
-	for (var i=0; i<module.length; i++) {
+	for (var i=0; i<modules.length; i++) {
 		var url  = urlPrefix + 'scripts/' + modules[i] + '.js';
 		var path = 'scripts/' + modules[i] + '.js';
 		
-		sys.writeToFile(path + '.bckp', sys.getFileContent(path) );
-		
-		sys.webCall(url, function(resp) {
-			sys.writeToFile(path, resp);
-			if (--toUpdate == 0)
-				reload();
-		});
+		(function(url, path){
+			sys.writeToFile(path + '.bckp', sys.getFileContent(path) );
+			
+			sys.webCall(url, function(resp) {
+				sys.writeToFile(path, resp);
+				Utils.message(user, "Downloaded " + url)
+				if (--toUpdate == 0)
+					reload();
+			});
+		})(url, path)
 	}
 	
 	function reload() {

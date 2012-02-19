@@ -30,9 +30,9 @@ var Mutes    = new Storage('mutes.txt');
 ({
 	beforeLogIn: function(id) {
 		var ip = sys.ip(id);
-		/*
+		
 		if (sys.auth(id) > 0 || ip== '127.0.0.1' )
-			return;*/
+			return;
 
 		var ban = TempBans.get(ip);
 		if (ban)
