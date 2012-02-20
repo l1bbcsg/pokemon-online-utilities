@@ -123,7 +123,7 @@ Commands.add('untempban', access.moderator, 'Разбанивает пользо
 Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с указанного урла.', function(user, param) {
 	//Utils.message(user, "Загружаю...");
 	var updateURL = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/tiers.xml";
-	if (param !== undefined && param.substring(0,7) == 'http://')
+	if (param !== undefined /*&& param.substring(0,7) == 'http://'*/)
 		updateURL = param;
 	
 	Utils.message(user, "Загружаю tiers.xml с " + updateURL.match(/\/\/(.*?)\//)[1]);
