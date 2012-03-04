@@ -76,7 +76,7 @@ Commands.add('mute', access.moderator, 'Лишает пользователя г
 	var prettytime = Utils.Time.pretty(time);
 	Utils.message(target, sys.name(mod) + ' лишил вас голоса на ' + prettytime);
 	Utils.message(mod, targetName + '(' +ip+ ') лишён голоса на ' + prettytime);
-	Utils.messageAll(sys.name(mod) + ' лишил ' + targetName ' голоса на ' + prettytime);
+	Utils.messageAll(sys.name(mod) + ' лишил ' + targetName + ' голоса на ' + prettytime);
 });
 
 Commands.add('unmute', access.moderator, 'Возвращает голос пользователю (требуется ip).', function(mod, ip) {
@@ -118,7 +118,7 @@ Commands.add('tempban', access.moderator, 'Банит пользователя �
 	var prettytime = Utils.Time.pretty(time);
 	Utils.message(target, sys.name(mod) + ' забанил вас на ' + prettytime);
 	Utils.message(mod, targetName + '(' +ip+ ') забанен на ' + prettytime);
-	Utils.messageAll(sys.name(mod) + ' забанил ' + targetName ' голоса на ' + prettytime);
+	Utils.messageAll(sys.name(mod) + ' забанил ' + targetName + ' голоса на ' + prettytime);
 	sys.kick(target);
 });
 
@@ -174,6 +174,11 @@ Commands.add('updatescripts', access.owner, 'Обновляет все моду�
 			} catch (err) {
 				Utils.message(user, "Ошибка: " + err);
 				print(err);
+				
+				for (var i=0; i<modules.length; i++) {
+					var path = 'scripts/' + modules[i] + '.js';
+					sys.writeToFile(path, sys.getFileContent(path + '.bckp') );
+				}
 				
 				sys.changeScript(sys.getFileContent('scripts.js.bckp'));
 				sys.writeToFile('scripts.js', sys.getFileContent('scripts.js.bckp') );
