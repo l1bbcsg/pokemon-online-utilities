@@ -5,11 +5,10 @@
 SESSION.identifyScriptAs('RPCv2.1');
 
 var ipinfo_api_key   = sys.getVal('api.txt', 'ipinfo');
-var pastebin_api_key = sys.getVal('api.txt', 'pastebin');
-var lastfm_api_key   = sys.getVal('api.txt', 'lastfm');
+//var pastebin_api_key = sys.getVal('api.txt', 'pastebin');
+//var lastfm_api_key   = sys.getVal('api.txt', 'lastfm');
 
 if(!sys.require) {
-	//sys.require = sys['import']		// ugly hack, should be fixed after .53
 	sys.require = function(filename) {
 		return eval( sys.getFileContent('scripts/'+filename) );
 	};

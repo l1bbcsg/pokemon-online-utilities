@@ -34,7 +34,12 @@ Commands.add('echo', access.user, 'Simple echo test', function(user, param) {
 });
 
 Commands.add('eval', access.owner, 'Evaluates passed code', function(user, code) {
-	res = sys.eval(code);
+	try {
+		res = sys.eval(code);
+	}
+	catch (e) {
+		Utils.message(user, "Ошибка: " + e);
+	}
 	if (res)
 		Utils.message(user, 'Команда вернула: ' + res);
 });
@@ -71,6 +76,7 @@ Commands.add('mute', access.moderator, 'Лишает пользователя г
 	var prettytime = Utils.Time.pretty(time);
 	Utils.message(target, sys.name(mod) + ' лишил вас голоса на ' + prettytime);
 	Utils.message(mod, targetName + '(' +ip+ ') лишён голоса на ' + prettytime);
+	Utils.messageAll(sys.name(mod) + ' лишил ' + targetName ' голоса на ' + prettytime);
 });
 
 Commands.add('unmute', access.moderator, 'Возвращает голос пользователю (требуется ip).', function(mod, ip) {
@@ -112,6 +118,7 @@ Commands.add('tempban', access.moderator, 'Банит пользователя �
 	var prettytime = Utils.Time.pretty(time);
 	Utils.message(target, sys.name(mod) + ' забанил вас на ' + prettytime);
 	Utils.message(mod, targetName + '(' +ip+ ') забанен на ' + prettytime);
+	Utils.messageAll(sys.name(mod) + ' забанил ' + targetName ' голоса на ' + prettytime);
 	sys.kick(target);
 });
 

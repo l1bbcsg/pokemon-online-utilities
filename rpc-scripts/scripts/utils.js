@@ -29,7 +29,6 @@
 				else
 					time[ res[2] ] = 1* res[1];
 			}
-			Utils.messageAll("got " + JSON.stringify(time));
 			return time;
 		},
 		
