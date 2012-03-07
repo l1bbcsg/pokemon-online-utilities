@@ -132,7 +132,7 @@ Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с ук�
 	Utils.message(user, "Загружаю tiers.xml с github");//.match(/\/\/(.*?)\//)[1]);
 	try {
 		sys.writeToFile('tiers.xml.bckp', sys.getFileContent('tiers.xml') );
-		sys.webCall(updateURL, "sys.writeToFile('tiers.xml', resp); sys.reloadTiers();");
+		sys.webCall(url, "sys.writeToFile('tiers.xml', resp); sys.reloadTiers();");
 	}
 	catch(e) {
 		Utils.message(user, "Ошибка: " + e);
