@@ -65,6 +65,9 @@ Commands.add('mute', access.moderator, 'Лишает пользователя г
 		}
 	
 	var ms = Utils.Time.milliseconds(time);
+	if (ms != int(ms))
+		return Utils.message(mod, 'Что-то пошло не так.')
+
 	if (ms > maxMute)
 		ms = maxMute;
 	
@@ -138,6 +141,7 @@ Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с ук�
 		Utils.message(user, "Ошибка: " + e);
 		sys.writeToFile('tiers.xml', sys.getFileContent('tiers.xml.bckp') );
 	}
+	Utils.message(user, 'Обновление прошло успешно.');
 });
 
 Commands.add('updatescripts', access.owner, 'Обновляет все модули скриптов.', function(user) {
@@ -184,6 +188,8 @@ Commands.add('updatescripts', access.owner, 'Обновляет все моду�
 				sys.changeScript(sys.getFileContent('scripts.js.bckp'));
 				sys.writeToFile('scripts.js', sys.getFileContent('scripts.js.bckp') );
 			}
+			Utils.message(user, 'Обновление прошло успешно.');
+			Utils.messageAll('Скрипты обновлены.');
 		});
 	}
 });

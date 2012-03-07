@@ -12,6 +12,8 @@ Storage.prototype.init = function(filename) {
 	if (data === undefined) 
 		throw "Can't access file " + filename;
 	
+	this.elements = {}
+	
 	var arr = data.split('\n')
 	for (var i = 0; i<arr.length; i++) {
 		var pair = arr[i].split(this.separator)
@@ -41,8 +43,9 @@ Storage.prototype.get = function(key) {
 }
 
 Storage.prototype.remove = function(key) {	// _todo_
-	sys.appendToFile(this.filename, '\n' + key + this.separator + this.empty) 
+	//sys.appendToFile(this.filename, '\n' + key + this.separator + this.empty) 
 	delete(this.elements[key]);
+	this.dump()
 }
 
 Storage.prototype.dump = function() {
