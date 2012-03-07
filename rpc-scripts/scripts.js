@@ -75,14 +75,14 @@ var Mutes    = new Storage('mutes.txt');
 	beforeChatMessage: function(pid, msg) {
 		var ip = sys.ip(pid);
 		var mute = Mutes.get(ip);
-		Utils.messageAll("mute: " + mute)
+		//Utils.messageAll("mute: " + mute)
 		if (mute)
 			if ((new Date()).getTime() > mute) {
-				Utils.messageAll("уже истёк")
+				//Utils.messageAll("уже истёк")
 				Mutes.remove(ip);
 			}
 			else {
-				Utils.messageAll("ещё не истёк")
+				//Utils.messageAll("ещё не истёк")
 				Utils.message(pid, 'Вы лишены голоса. Осталось ' + Utils.Time.pretty(Utils.Time.parseEpoch(mute)));
 				sys.stopEvent();
 				return;
