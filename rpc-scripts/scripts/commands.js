@@ -26,8 +26,6 @@ var Commands = {
 	},
 }
 
-// updatescripts(component, url)
-
 Commands.add('echo', access.user, 'Simple echo test', function(user, param) {
 	msg = sys.name(user) + ', эхо: ' + param;
 	Utils.message(user, msg);
@@ -129,14 +127,17 @@ Commands.add('untempban', access.moderator, 'Разбанивает пользо
 
 Commands.add('updatetiers', access.owner, 'Обновляет tiers.xml с указанного урла.', function(user, param) {
 	//Utils.message(user, "Загружаю...");
-	var updateURL = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/tiers.xml";
-	if (param !== undefined /*&& param.substring(0,7) == 'http://'*/)
-		updateURL = param;
+	var url = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/tiers.xml";
 	
-	Utils.message(user, "Загружаю tiers.xml с " + updateURL.match(/\/\/(.*?)\//)[1]);
-	sys.writeToFile('.bckp.tiers.xml', sys.getFileContent('tiers.xml') );
-	sys.webCall(updateURL, "sys.writeToFile('tiers.xml', resp); sys.reloadTiers();");
-	return;
+	Utils.message(user, "Загружаю tiers.xml с github");//.match(/\/\/(.*?)\//)[1]);
+	try {
+		sys.writeToFile('tiers.xml.bckp', sys.getFileContent('tiers.xml') );
+		sys.webCall(updateURL, "sys.writeToFile('tiers.xml', resp); sys.reloadTiers();");
+	}
+	catch(e) {
+		Utils.message(user, "Ошибка: " + e);
+		sys.writeToFile('tiers.xml', sys.getFileContent('tiers.xml.bckp') );
+	}
 });
 
 Commands.add('updatescripts', access.owner, 'Обновляет все модули скриптов.', function(user) {
@@ -191,7 +192,7 @@ Commands.add('commands', access.user, 'Показывает все доступ�
 	var msg = '<dl>';	// _todo_ prettier html
 	for (var command in Commands.commands)
 		if (Commands.canAccess(user, command)) {
-			msg += '<dt>' + command + '</dt>';
+			msg += '<dt>/' + command + '</dt>';
 			msg += '<dd>' + Commands.commands[command].descr + '</dd>';
 		}
 	msg += '</dl>';
@@ -207,6 +208,53 @@ Commands.add('topic', access.moderator, 'Изменяет тему в загол
 
 Commands.add('me', access.user, 'Сообщение в третьем лице.', function(user, param) {
 	Utils.messageAll('<b style="color: ' +sys.getColor(user)+ '">***' + sys.name(user) + '</b> ' + param);
+});
+
+Commands.add('ghosts', access.user, 'Выкидывает пользователей с тем же IP. Если передан параметр, выкинет только польователя с этим ником.', function(user, param) {
+	var players = sys.playerIds();
+	var ip = sys.ip(user);
+	
+	if (param === undefined)
+		for (var i = players.length; i --> 0;)
+			if (sys.id(players[i]) != user && sys.ip(players[i]) == ip) {
+				Utils.message(user, sys.name(players[i]) + ' выкинут.');
+				sys.kick(players[i])
+			}
+	else
+		if (sys.ip(param) == ip)
+			sys.kick(sys.id(param));
+});
+
+
+Commands.add('whois', access.user, 'Информация о пользователе.', function(user, param) {
+	var id = sys.id(param);
+	var ip = sys.ip(param);
+	
+	if (id === undefined) {
+		Utils.message(user, 'Нет такого пользователя, "'+param+'".');
+		return;
+	}
+	
+	var s = '<table><tr><th><img src="avatar:' +sys.avatar(id)+ '"/></th><td>';
+	
+	s += 'Пользователь ' + param;
+	
+	if (sys.dbRegistered(id))
+		s += ' (зарегистирован)';
+	s += '<br>';
+	
+	s += 'Страна: ' + (SESSION.users(id).country || 'Неизвестно') + '<br>';
+	
+	if (sys.auth(user) > 0)
+		s += 'IP: ' + sys.ip(id) + ', id: ' +id+ '<br>';
+	
+	var aliases = sys.aliases(ip)
+	if (aliases.length)
+		s += 'Также известен как: ' + aliases.join(' ');
+		
+	s += '</td></tr></table>';
+	
+	Utils.message(user, s);
 });
 
 Commands // eval will return this
