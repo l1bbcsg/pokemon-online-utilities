@@ -17,8 +17,8 @@ Storage.prototype.init = function(filename) {
 	var arr = data.split('\n')
 	for (var i = 0; i<arr.length; i++) {
 		var pair = arr[i].split(this.separator)
-		if (pair[1] == this.empty)
-			continue;
+		/*if (pair[1] == this.empty)
+			continue;*/
 		this.elements[pair[0]] = pair[1];
 	}
 	return true;

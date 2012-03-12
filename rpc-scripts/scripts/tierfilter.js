@@ -24,7 +24,7 @@ var TierFilter = {
 		if (stoppable === undefined)
 			stoppable = true;
 		
-		if (TierFilter.exists(tier)) {
+		if (TierFilter.exists(tier)) {	// what if tier is not set?
 			var errors = TierFilter.validate(pid, tier);
 			if (errors && errors.length) {
 				sys.sendMessage(pid, 'Команда не подходит для ' + tier);
@@ -47,7 +47,7 @@ var TierFilter = {
 		for (var i = 0; i<queue.length; i++) {
 			if (sys.hasLegalTeamForTier(pid, queue[i]) 
 				&& !TierFilter.exists[queue[i]] 
-				&& !TierFilter.validate(pid, queue[i]).length )
+				&& !(TierFilter.validate(pid, queue[i]).length) )
 				return queue[i];
 		}
 	},

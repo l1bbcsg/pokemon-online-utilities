@@ -62,10 +62,12 @@ var Mutes    = new Storage('mutes.txt');
 	
 	afterLogIn: function(pid) {
 		TierFilter.filter(pid, sys.tier(pid), false);
+		Utils.anonymous(pid);
 	},
 	
 	afterChangeTeam: function(pid) {
 		TierFilter.filter(pid, sys.tier(pid), false);
+		Utils.anonymous(pid);
 	},
 	
 	beforeChangeTier: function(pid, oldtier, newtier) {

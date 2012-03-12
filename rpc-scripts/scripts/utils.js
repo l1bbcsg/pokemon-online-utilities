@@ -20,7 +20,7 @@
 		parseString: function(string) {
 			var time = {d: 0, h: 0, m: 0, s: 0};
 			
-			var a = string.split(' ');
+			var a = string.trim().split(' ');
 			
 			for (var i in a) {
 				var res = a[i].match(/^(\d+)([dhms])$/i);
@@ -56,5 +56,14 @@
 		pretty: function(o) {
 			return (o.d? o.d + ' дн. ' :'') + (o.h? o.h + ' час. ' :'') + (o.m? o.m + ' мин. ' :'') + (o.s? o.s + ' сек. ' :'');
 		},
+	},
+	
+	anonymous: function(user) {
+		var today = new Date();
+		if (today.getMonth() == 4-1 && today.getDate() == 0) {
+			sys.changeName(user, 'Anonymous');
+			sys.changeAvatar(user, 0);
+			sys.changeInfo(user, 'We are Anonymous, we are Legion...');
+		}
 	},
 })

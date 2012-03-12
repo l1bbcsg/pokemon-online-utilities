@@ -44,11 +44,21 @@ Commands.add('eval', access.owner, 'Evaluates passed code', function(user, code)
 
 Commands.add('mute', access.moderator, 'Лишает пользователя голоса.', function(mod, param) {
 	var maxMute = 24 * 60 * 60 * 1000;	// день
-	var defMute = 60 * 60 * 1000;	// минута
-	var time = defMute;
+	var defMute = 5 * 60 * 1000;	// 5 минут
+	var time = undefined;
 	
-	var a = param.split(' ');
-	var targetName = a[0];
+	if (!param)
+		return;
+	
+	var timeString = undefined;
+	var targetName = param;
+	
+	var match = param.match(/(?: [0-9]+[dhms])*$/i)
+	if (match) {
+		timeString = match[0];
+		targetName = param.substr(0, param.length-timeString.length)
+	}
+	
 	var target = sys.id(targetName);
 	
 	if (!target) {
@@ -56,16 +66,17 @@ Commands.add('mute', access.moderator, 'Лишает пользователя г
 		return;
 	}
 	
-	if (a.length>1)
+	var ms = defMute;
+	if (timeString)
 		try {
-			time = Utils.Time.parseString(a.slice(1).join(' '));
+			time = Utils.Time.parseString(timeString);
+			ms = Utils.Time.milliseconds(time);
 		}
 		catch (e) {
 			Utils.message(mod, e);
 		}
-	
-	var ms = Utils.Time.milliseconds(time);
-	if (ms != int(ms))
+
+	if (ms != parseInt(ms))
 		return Utils.message(mod, 'Что-то пошло не так.')
 
 	if (ms > maxMute)
@@ -74,7 +85,7 @@ Commands.add('mute', access.moderator, 'Лишает пользователя г
 	var ip = sys.ip(target);
 	Mutes.add(ip, (new Date()).getTime() + ms);
 	
-	var prettytime = Utils.Time.pretty(time);
+	var prettytime = time? Utils.Time.pretty(time) : '5 минут';
 	Utils.message(target, sys.name(mod) + ' лишил вас голоса на ' + prettytime);
 	Utils.message(mod, targetName + '(' +ip+ ') лишён голоса на ' + prettytime);
 	Utils.messageAll(sys.name(mod) + ' лишил ' + targetName + ' голоса на ' + prettytime);
@@ -89,34 +100,47 @@ Commands.add('unmute', access.moderator, 'Возвращает голос пол
 Commands.add('tempban', access.moderator, 'Банит пользователя на некоторое время.', function(mod, param) {
 	var maxBan = 07 * 24 * 60 * 60;	// неделя
 	var defBan = 60 * 60 * 60;	// час
-	var time   = defBan;
+	var time = undefined;
 	
-	var a = param.split(' ');
-	var targetName = a[0];
+	if (!param)
+		return;
+	
+	var timeString = undefined;
+	var targetName = param;
+	
+	var match = param.match(/(?: [0-9]+[dhms])*$/i)
+	if (match) {
+		timeString = match[0];
+		targetName = param.substr(0, param.length-timeString.length)
+	}
+	
 	var target = sys.id(targetName);
 	
 	if (!target) {
-		Utils.message(mod, 'Эээ, некого банить.');
+		Utils.message(mod, 'Нет такого пользователя "' +targetName+ '".');
 		return;
 	}
 	
-	if (a.length>1)
+	var ms = defMute;
+	if (timeString)
 		try {
-			time = Utils.Time.parseString(a.slice(1).join(' '));
+			time = Utils.Time.parseString(timeString);
+			ms = Utils.Time.milliseconds(time);
 		}
 		catch (e) {
 			Utils.message(mod, e);
 		}
-	
-	
-	var ms = Utils.Time.milliseconds(time);
-	if (ms > maxBan)
-		ms = maxBan;
+
+	if (ms != parseInt(ms))
+		return Utils.message(mod, 'Что-то пошло не так.')
+
+	if (ms > maxMute)
+		ms = maxMute;
 	
 	var ip = sys.ip(target);
 	TempBans.add(ip, (new Date()).getTime() + ms);
 	
-	var prettytime = Utils.Time.pretty(time);
+	var prettytime = time? Utils.Time.pretty(time) : 'час';
 	Utils.message(target, sys.name(mod) + ' забанил вас на ' + prettytime);
 	Utils.message(mod, targetName + '(' +ip+ ') забанен на ' + prettytime);
 	Utils.messageAll(sys.name(mod) + ' забанил ' + targetName + ' голоса на ' + prettytime);
@@ -207,9 +231,14 @@ Commands.add('commands', access.user, 'Показывает все доступ�
 
 Commands.add('topic', access.moderator, 'Изменяет тему в заголовке сервера.', function(user, param) {
 	var separator = '<!--separator-->';
-	var header =  sys.getAnnouncement().split(separator)[0];
-	sys.changeAnnouncement(header + separator + param);
-	Utils.messageAll(sys.name(user) + ' изменил тему.');
+	var current =  sys.getAnnouncement().split(separator);
+	
+	if (!param)
+		Utils.message(user, 'Текущая тема: ' + current[1].replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+	else {
+		sys.changeAnnouncement(current[0] + separator + param);
+		Utils.messageAll(sys.name(user) + ' изменил тему.');
+	}
 });
 
 Commands.add('me', access.user, 'Сообщение в третьем лице.', function(user, param) {
