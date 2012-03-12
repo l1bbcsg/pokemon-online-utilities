@@ -24,7 +24,7 @@ var TierFilter = {
 		if (stoppable === undefined)
 			stoppable = true;
 		
-		if (TierFilter.exists(tier)) {	// what if tier is not set?
+		if (tier && TierFilter.exists(tier)) {
 			var errors = TierFilter.validate(pid, tier);
 			if (errors && errors.length) {
 				sys.sendMessage(pid, 'Команда не подходит для ' + tier);
@@ -41,6 +41,8 @@ var TierFilter = {
 					sys.changeTier(pid, TierFilter.findAppropriateTier(pid));
 			}
 		}
+		else
+			sys.changeTier(pid, TierFilter.findAppropriateTier(pid));
 	},
 	findAppropriateTier: function(pid) {
 		var queue = ['Wifi UU', 'DW UU', 'Wifi OU', 'DW OU', 'Wifi Ubers', 'DW Ubers', 'Challenge Cup'];
