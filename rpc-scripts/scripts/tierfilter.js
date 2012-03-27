@@ -200,6 +200,7 @@ TierFilter.add(['Красный Октябрь', 'Третий Межсайто�
 	return [];
 });
 
+	// Dream World
 TierFilter.add(['Wifi OU', 'Wifi UU', 'Wifi Ubers'], function(pid) {
 	var ret = []
 	for (var slot =0; slot<6; slot++) {

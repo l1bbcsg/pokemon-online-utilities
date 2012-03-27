@@ -173,7 +173,7 @@ Commands.add('updatescripts', access.owner, 'Обновляет все моду�
 	var urlPrefix = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/";
 	//var urlPrefix = "file:///home/ilya/projects/pokemon-online-utilities/rpc-scripts/";
 	
-	var modules = ['utils.js', 'storage.js', 'commands.js', 'tierfilter.js', 'user.js', 'api.txt', 'DWFemales.txt'];
+	var modules = ['DWFemales.txt', 'api.txt', 'utils.js', 'storage.js', 'commands.js', 'tierfilter.js', 'user.js'];
 	var toUpdate = modules.length;
 	
 	for (var i=0; i<modules.length; i++) {
