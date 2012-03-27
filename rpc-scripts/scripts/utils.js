@@ -1,4 +1,4 @@
-({
+var Utils = {
 	message: function(pid, content) {
 		sys.sendHtmlMessage(pid, '<timestamp/> <b style="color: '+sys.getColor(pid)+'">'+ sys.name(pid) +'</b>: '+ content);
 	},
@@ -66,4 +66,13 @@
 			sys.changeInfo(user, 'We are Anonymous, we are Legion...');
 		}
 	},
-})
+}
+
+var names = sys.getFileContent('scripts/DWFemales.txt').split('\n');
+
+Utils.DW = {
+	female:      names.map(sys.pokeNum),
+	femaleNames: names,
+};
+
+Utils

@@ -200,6 +200,19 @@ TierFilter.add(['Красный Октябрь', 'Третий Межсайто�
 	return [];
 });
 
-// _todo_ DreamWorld
+TierFilter.add(['Wifi OU', 'Wifi UU', 'Wifi Ubers'], function(pid) {
+	var ret = []
+	for (var slot =0; slot<6; slot++) {
+		var poke = sys.teamPoke(pid, slot);
+		if (!sys.hasDreamWorldAbility(pid, slot))
+			continue;
+		if (-1 != Utils.DW.female.indexOf(poke))
+			continue;
+		else if (sys.compatibleAsDreamWorldEvent(pid, slot))
+			continue;
+		ret.push(sys.pokemon(poke) + ' is not released in DW yet.');
+	}
+	return ret;
+})
 
 TierFilter // eval will return this

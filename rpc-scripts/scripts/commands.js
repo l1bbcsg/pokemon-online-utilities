@@ -93,7 +93,7 @@ Commands.add('mute', access.moderator, 'Лишает пользователя г
 
 Commands.add('unmute', access.moderator, 'Возвращает голос пользователю (требуется ip).', function(mod, ip) {
 	Mutes.remove(ip);
-	Utils.message(target, sys.name(mod) + ' + вернул вам голос.');
+	//Utils.message(target, sys.name(mod) + ' + вернул вам голос.');
 	Utils.message(mod, ip + ' снова имеет голос.');
 });
 
@@ -173,12 +173,12 @@ Commands.add('updatescripts', access.owner, 'Обновляет все моду�
 	var urlPrefix = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/";
 	//var urlPrefix = "file:///home/ilya/projects/pokemon-online-utilities/rpc-scripts/";
 	
-	var modules = ['utils', 'storage', 'commands', 'tierfilter', 'user'];
+	var modules = ['utils.js', 'storage.js', 'commands.js', 'tierfilter.js', 'user.js', 'api.txt', 'DWFemales.txt'];
 	var toUpdate = modules.length;
 	
 	for (var i=0; i<modules.length; i++) {
-		var url  = urlPrefix + 'scripts/' + modules[i] + '.js';
-		var path = 'scripts/' + modules[i] + '.js';
+		var url  = urlPrefix + 'scripts/' + modules[i];
+		var path = 'scripts/' + modules[i];
 		
 		(function(url, path){
 			sys.writeToFile(path + '.bckp', sys.getFileContent(path) );
@@ -205,7 +205,7 @@ Commands.add('updatescripts', access.owner, 'Обновляет все моду�
 				print(err);
 				
 				for (var i=0; i<modules.length; i++) {
-					var path = 'scripts/' + modules[i] + '.js';
+					var path = 'scripts/' + modules[i];
 					sys.writeToFile(path, sys.getFileContent(path + '.bckp') );
 				}
 				
