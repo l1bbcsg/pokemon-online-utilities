@@ -1,8 +1,8 @@
 // Russian Pokemon Community PO scripts
-// Версия 2.1.0; Рассчитано на PO 1.0.53
+// Версия 2.2.0; Рассчитано на PO 1.0.53
 // Questions can be asked in pokeworld@conference.pokecenter.ru 
 
-SESSION.identifyScriptAs('RPCv2.1');
+SESSION.identifyScriptAs('RPCv2.2');
 
 var ipinfo_api_key   = sys.getVal('api.txt', 'ipinfo');
 //var pastebin_api_key = sys.getVal('api.txt', 'pastebin');
@@ -15,16 +15,16 @@ if(!sys.require) {
 };
 
 var Utils      = sys.require('utils.js');
-var Commands   = sys.require('commands.js');
 var TierFilter = sys.require('tierfilter.js');
 var User       = sys.require('user.js');
 var Storage    = sys.require('storage.js');
+var Log        = sys.require('log.js');
+var Commands   = sys.require('commands.js');
 
 SESSION.registerUserFactory(User);
 
 var TempBans = new Storage('tempbans.txt');
 var Mutes    = new Storage('mutes.txt');
-
 
 ({
 	beforeLogIn: function(id) {
@@ -63,6 +63,7 @@ var Mutes    = new Storage('mutes.txt');
 	afterLogIn: function(pid) {
 		TierFilter.filter(pid, sys.tier(pid), false);
 		Utils.anonymous(pid);
+		Log.print(pid)
 	},
 	
 	afterChangeTeam: function(pid) {
@@ -102,6 +103,10 @@ var Mutes    = new Storage('mutes.txt');
 		}
 	},
 	
+	afterChatMessage: function(pid, msg) {
+		Log.add(pid, msg);
+	},
+
 	serverShutDown: function() {
 		Mutes.dump();
 		TempBans.dump();

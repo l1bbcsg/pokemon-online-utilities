@@ -173,7 +173,7 @@ Commands.add('updatescripts', access.owner, 'Обновляет все моду�
 	var urlPrefix = "https://raw.github.com/l1bbcsg/pokemon-online-utilities/master/rpc-scripts/";
 	//var urlPrefix = "file:///home/ilya/projects/pokemon-online-utilities/rpc-scripts/";
 	
-	var modules = ['DWFemales.txt', 'api.txt', 'utils.js', 'storage.js', 'commands.js', 'tierfilter.js', 'user.js'];
+	var modules = ['DWFemales.txt', 'api.txt', 'utils.js', 'storage.js', 'log.js', 'commands.js', 'tierfilter.js', 'user.js'];
 	var toUpdate = modules.length;
 	
 	for (var i=0; i<modules.length; i++) {
@@ -290,6 +290,10 @@ Commands.add('whois', access.user, 'Информация о пользовате
 	s += '</td></tr></table>';
 	
 	Utils.message(user, s);
+});
+
+Commands.add('log', access.user, 'Лог последних сообщений.', function(user, param) {
+	Log.print(user, parseInt(param));
 });
 
 Commands // eval will return this
