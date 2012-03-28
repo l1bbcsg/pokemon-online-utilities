@@ -143,7 +143,7 @@ TierFilter.add(['Третий Межсайтовый', 'Февральский �
 	// Комбо Swift Swim + Drizzle
 TierFilter.add(['Февральский Турнир'], function(pid) {
 	var Drizzle     = false,
-		SwiftSwim = false;
+	    SwiftSwim = false;
 
 	var ret = [];
 	
@@ -164,7 +164,7 @@ TierFilter.add(['Февральский Турнир'], function(pid) {
 	// Комбо Chlorophyll + Drought
 TierFilter.add(['Февральский Турнир'], function(pid) {
 	var Drought     = false,
-		Chlorophyll = false;
+	    Chlorophyll = false;
 
 	var ret = [];
 	

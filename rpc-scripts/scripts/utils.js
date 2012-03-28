@@ -60,7 +60,7 @@ var Utils = {
 	
 	anonymous: function(user) {
 		var today = new Date();
-		if (today.getMonth() == 4-1 && today.getDate() == 0) {
+		if (today.getMonth() == 4-1 && today.getDate() == 1) {
 			sys.changeName(user, 'Anonymous');
 			sys.changeAvatar(user, 0);
 			sys.changeInfo(user, 'We are Anonymous, we are Legion...');

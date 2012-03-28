@@ -31,9 +31,6 @@ Log.prototype.print = function(user, howMany) {
 	}
 	else
 		Utils.message(user, 'Нет сообщений.');
-}
+};
 
-//sys.sendHtmlAll(JSON.stringify(this));
-//sys.sendHtmlAll('hello from log');	// что это блять? почему без этого падает блять?
-sys.ability(12);
 (new Log())
