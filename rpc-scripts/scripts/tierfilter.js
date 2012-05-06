@@ -125,7 +125,7 @@ filter.add(['Третий Межсайтовый', 'Февральский Ту�
 	for (var slot = 0; slot<6; slot++)
 		if (sys.teamPoke(pid, slot) == sys.pokeNum('Blaziken') 
 		 && sys.teamPokeAbility(pid, slot) == sys.abilityNum('Speed Boost')
-		// && sys.indexOfTeamPokeMove(pid, slot, sys.moveNum('Swords Dance')) !== undefined)
+		) // && sys.indexOfTeamPokeMove(pid, slot, sys.moveNum('Swords Dance')) !== undefined)
 			ret.push('Blaziken со Speed Boost ' + /*и Swords Dance*/' запрещён в этом турнире.');
 
 	return ret;
