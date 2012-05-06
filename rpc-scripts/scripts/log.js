@@ -1,13 +1,13 @@
 function Log() {
 	this.maxSize = 20;
 	this.size = 0;
-	this.messages = []
+	this.messages = [];	 // Можно сделать {time: Date, username: '', message: ''}
 };
 
 Log.prototype.add = function(user, message) {
-	var d = new Date()
-	var timestamp = '('+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+')';
-	var html = timestamp + ' <b style="padding-left: 20px; color: #'+sys.getColor(user)+';">' + sys.name(user) + '</b>: ' + message;
+	var d = new Date();
+	var timestamp = '('+Utils.padString(d.getHours(), 2)+':'+Utils.padString(d.getMinutes(), 2)+':'+Utils.padString(d.getSeconds(), 2)+')';
+	var html = timestamp + ' <b>' + sys.name(user) + '</b>: ' + message;
 	this.messages.push(html)
 	if (this.size > this.maxSize)
 		this.messages.shift()

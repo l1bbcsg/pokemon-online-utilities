@@ -6,6 +6,14 @@ var Utils = {
 	messageAll: function(content) {
 		sys.sendHtmlAll('<timestamp/> ' + content);
 	},
+
+	/*fakeMessage: function(username, text, timestamp, color) {
+		if (!timestamp)
+			timestamp = new Date();
+		if (!color)
+			color = sys.getColor( sys.id(username) ) || '#000000';
+
+	},*/
 	/*
 	shutDown: function() {
 		var s = '';
@@ -65,6 +73,15 @@ var Utils = {
 			sys.changeAvatar(user, 0);
 			sys.changeInfo(user, 'We are Anonymous, we are Legion...');
 		}
+	},
+
+	padString: function(string, length, fill) {
+		string = '' + string;
+		if (fill === undefined)
+			fill = '0';
+		for (var i = string.length; i<length; i++)
+			string = fill + string;
+		return string;
 	},
 }
 

@@ -1,68 +1,73 @@
-var TierFilter = {
-	filters: {}, // 'tier': [func]
-	
-	add: function(affected, func) {
-		for (var i in affected) {
-			tier = affected[i];
-			if (TierFilter.filters[tier])
-				TierFilter.filters[tier].push(func);
-			else
-				TierFilter.filters[tier] = [func];
-		}
-	},
-	exists: function(tier) { return TierFilter.filters.hasOwnProperty(tier) },
-	validate : function(pid, tier) {
-		ret = [];
-		for (var i in TierFilter.filters[tier])
-			ret = ret.concat( TierFilter.filters[tier][i](pid) );
-		return ret;
-	},
-	
-	filter: function(pid, tier, stoppable) {
-		if (!tier)
-			tier = sys.tier(pid);
-		if (stoppable === undefined)
-			stoppable = true;
-		
-		if (tier && TierFilter.exists(tier)) {
-			var errors = TierFilter.validate(pid, tier);
-			if (errors && errors.length) {
-				sys.sendMessage(pid, 'Команда не подходит для ' + tier);
-				
-				var msg = '<ul>';
-				for (var i = 0; i<errors.length; i++)
-					msg += '<li>' + errors[i] + '</li>';
-				msg += '</ul>'
-				sys.sendHtmlMessage(pid, msg);
-				
-				if (stoppable)
-					sys.stopEvent();
-				else
-					sys.changeTier(pid, TierFilter.findAppropriateTier(pid));
-			}
-		}
-		else
-			sys.changeTier(pid, TierFilter.findAppropriateTier(pid));
-	},
-	findAppropriateTier: function(pid) {
-		var queue = ['Wifi UU', 'DW UU', 'Wifi OU', 'DW OU', 'Wifi Ubers', 'DW Ubers', 'Challenge Cup'];
-		for (var i = 0; i<queue.length; i++) {
-			if (sys.hasLegalTeamForTier(pid, queue[i]) 
-				&& !TierFilter.exists[queue[i]] 
-				&& !(TierFilter.validate(pid, queue[i]).length) )
-				return queue[i];
-		}
-	},
+TierFilter = function() {
+	this.filters = {}, // 'tier': [func]
 }
 
+TierFilter.prototype.add = function(affected, func) {
+	for (var i in affected) {
+		tier = affected[i];
+		if (this.filters[tier])
+			this.filters[tier].push(func);
+		else
+			this.filters[tier] = [func];
+	}
+};
 
+TierFilter.prototype.exists = function(tier) { // Checks if there are any filters for a tier
+	return this.filters.hasOwnProperty(tier)
+};
+
+TierFilter.prototype.validate = function(pid, tier) {	// Does the actual validation, returns array of errors
+	ret = [];
+	for (var i in this.filters[tier])
+		ret = ret.concat( this.filters[tier][i](pid) );
+	return ret;
+};
+	
+TierFilter.prototype.filter = function(pid, tier, stoppable) {	// Wrapper for validation, formats and prints errors
+	if (!tier)
+		tier = sys.tier(pid);
+	if (stoppable === undefined)
+		stoppable = true;
+	
+	if (tier && this.exists(tier)) {
+		var errors = this.validate(pid, tier);
+		if (errors && errors.length) {
+			sys.sendMessage(pid, 'Команда не подходит для ' + tier);
+			
+			var msg = '<ul>';
+			for (var i = 0; i<errors.length; i++)
+				msg += '<li>' + errors[i] + '</li>';
+			msg += '</ul>'
+			sys.sendHtmlMessage(pid, msg);
+			
+			if (stoppable)
+				sys.stopEvent();
+			else
+				sys.changeTier(pid, this.findAppropriateTier(pid));
+		}
+	}
+	else
+		sys.changeTier(pid, this.findAppropriateTier(pid));
+};
+
+TierFilter.prototype.findAppropriateTier = function(pid) {	// Guesses user's tier
+	var queue = ['Wifi UU', 'DW UU', 'Wifi OU', 'DW OU', 'Wifi Ubers', 'DW Ubers', 'Challenge Cup'];
+	for (var i = 0; i<queue.length; i++) {
+		if (sys.hasLegalTeamForTier(pid, queue[i]) 
+			&& !this.exists[queue[i]] 
+			&& !(this.validate(pid, queue[i]).length) )
+			return queue[i];
+	}
+};
+
+filter = new TierFilter()
 // Examples
-/*TierFilter.add(['Disabled Tier', 'Another Disabled Tier'], function(pid) { return ['This tier is disabled']; });
-TierFilter.add(['Disabled Tier'], function(pid) { return ['No, seriously disabled', 'No jokes here']; });
-TierFilter.add(['Disabled Tier'], function(pid) { if(parseInt(Math.random()*10)) return ['You also have bad luck']; else return []; });
+/*filter.add(['Disabled Tier', 'Another Disabled Tier'], function(pid) { return ['This tier is disabled']; });
+filter.add(['Disabled Tier'], function(pid) { return ['No, seriously disabled', 'No jokes here']; });
+filter.add(['Disabled Tier'], function(pid) { if(parseInt(Math.random()*10)) return ['You also have bad luck']; else return []; });
 */
 
-TierFilter.add(['Monotype'], function(pid) {
+filter.add(['Monotype'], function(pid) {
 	var excluded = 17;
 	var gen = 5;	// can't monotype be played in other gens?
 	var TypeA = sys.pokeType1(sys.teamPoke(pid, 0), gen);
@@ -83,7 +88,7 @@ TierFilter.add(['Monotype'], function(pid) {
 	return [];
 });
 /*
-TierFilter.add(['Красный Октябрь'], function(pid) {
+filter.add(['Красный Октябрь'], function(pid) {
 	var ret = [];
 	var slot = sys.indexOfTeamPoke(src, sys.pokeNum('Blaziken'));
 	if (slot != undefined && sys.teamPokeAbility == sys.abilityNum('Speed Boost'))
@@ -112,23 +117,23 @@ TierFilter.add(['Красный Октябрь'], function(pid) {
 	ret.push('Сердце Слушай, Товарищ! Божий Сын! Выбор сделай!');
 	return ret;
 });
-
-	// Blaziken + Speed Boost + Swords Dance
-TierFilter.add(['Третий Межсайтовый', 'Февральский Турнир'], function(pid) {
+*/
+	// Blaziken + Speed Boost //+ Swords Dance
+filter.add(['Третий Межсайтовый', 'Февральский Турнир', 'Личный Турнир'], function(pid) {
 	var ret = [];
 
 	for (var slot = 0; slot<6; slot++)
 		if (sys.teamPoke(pid, slot) == sys.pokeNum('Blaziken') 
 		 && sys.teamPokeAbility(pid, slot) == sys.abilityNum('Speed Boost')
-		 && sys.indexOfTeamPokeMove(pid, slot, sys.moveNum('Swords Dance')) !== undefined)
-			ret.push('Blaziken со Speed Boost и Swords Dance запрещён в этом турнире');
+		// && sys.indexOfTeamPokeMove(pid, slot, sys.moveNum('Swords Dance')) !== undefined)
+			ret.push('Blaziken со Speed Boost ' + /*и Swords Dance*/' запрещён в этом турнире.');
 
 	return ret;
 });
-*/
+
 
 	// Shadow Tag && Moody
-TierFilter.add(['Третий Межсайтовый', 'Февральский Турнир'], function(pid) {
+filter.add(['Третий Межсайтовый', 'Февральский Турнир', 'Личный Турнир'], function(pid) {
 	var ret = [];
 	var bannedAbilities = [sys.abilityNum('Shadow Tag'), sys.abilityNum('Moody')];
 	
@@ -141,7 +146,7 @@ TierFilter.add(['Третий Межсайтовый', 'Февральский �
 });
 
 	// Комбо Swift Swim + Drizzle
-TierFilter.add(['Февральский Турнир'], function(pid) {
+filter.add(['Февральский Турнир', 'Личный Турнир'], function(pid) {
 	var Drizzle     = false,
 	    SwiftSwim = false;
 
@@ -162,7 +167,7 @@ TierFilter.add(['Февральский Турнир'], function(pid) {
 });
 
 	// Комбо Chlorophyll + Drought
-TierFilter.add(['Февральский Турнир'], function(pid) {
+filter.add(['Февральский Турнир', 'Личный Турнир'], function(pid) {
 	var Drought     = false,
 	    Chlorophyll = false;
 
@@ -183,7 +188,7 @@ TierFilter.add(['Февральский Турнир'], function(pid) {
 });
 
 	// Excadrill + Sand Rush
-TierFilter.add(['Февральский Турнир'], function(pid) {
+filter.add(['Февральский Турнир', 'Личный Турнир'], function(pid) {
 	var ret = [];
 
 	for (var slot = 0; slot<6; slot++)
@@ -194,14 +199,14 @@ TierFilter.add(['Февральский Турнир'], function(pid) {
 });
 
 	// Allow only lvl 100
-TierFilter.add(['Красный Октябрь', 'Третий Межсайтовый', 'Февральский Турнир'], function(pid) {
+filter.add(['Красный Октябрь', 'Третий Межсайтовый', 'Февральский Турнир', 'Личный Турнир'], function(pid) {
 	for (var slot = 0; slot<6; slot++)
 		sys.changePokeLevel(pid, slot, 100);
 	return [];
 });
 
 	// Dream World
-TierFilter.add(['Wifi OU', 'Wifi UU', 'Wifi Ubers'], function(pid) {
+filter.add(['Wifi OU', 'Wifi UU', 'Wifi Ubers'], function(pid) {
 	var ret = []
 	for (var slot =0; slot<6; slot++) {
 		var poke = sys.teamPoke(pid, slot);
@@ -216,4 +221,4 @@ TierFilter.add(['Wifi OU', 'Wifi UU', 'Wifi Ubers'], function(pid) {
 	return ret;
 })
 
-TierFilter // eval will return this
+filter // eval will return this
