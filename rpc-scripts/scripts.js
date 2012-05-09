@@ -1,5 +1,5 @@
 // Russian Pokemon Community PO scripts
-// Версия 2.2.0; Рассчитано на PO 1.0.53
+// Версия 2.2.2; Рассчитано на PO 1.0.53
 // Questions can be asked in pokeworld@conference.pokecenter.ru 
 
 SESSION.identifyScriptAs('RPCv2.2');

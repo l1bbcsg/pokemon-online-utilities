@@ -269,12 +269,6 @@ Commands.add({
 	access : access.user,
 	descr  : 'Показывает все доступные команды.', 
 	func   : function(user, param) {	// вся "инкапсуляция" к чертям (
-
-/*
-	this.objects = []; // [function_id: {object}]
-	this.names   = {};	// ['echo': function_id]
-*/
-	Utils.messageAll(JSON.stringify(Commands))
 		var msg = '<dl>';
 		for (var i=0; i<Commands.objects.length; i++) {
 			// _todo_ 
