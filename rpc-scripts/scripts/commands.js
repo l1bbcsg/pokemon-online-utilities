@@ -43,7 +43,7 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: 'eval',
+	aliases: ['eval'],
 	access : access.owner, 
 	descr  : 'Evaluates passed code',
 	func   : function(user, code) {
@@ -265,16 +265,26 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: 'commands',
+	aliases: ['commands'],
 	access : access.user,
 	descr  : 'Показывает все доступные команды.', 
 	func   : function(user, param) {	// вся "инкапсуляция" к чертям (
-		var msg = '<dl>';	// _todo_ prettier html
-		for (var command in Commands.commands)
-			if (Commands.canAccess(user, command)) {
-				msg += '<dt>/' + command + '</dt>';
-				msg += '<dd>' + Commands.commands[command].descr + '</dd>';
-			}
+
+/*
+	this.objects = []; // [function_id: {object}]
+	this.names   = {};	// ['echo': function_id]
+*/
+	Utils.messageAll(JSON.stringify(Commands))
+		var msg = '<dl>';
+		for (var i=0; i<Commands.objects.length; i++) {
+			// _todo_ 
+			var aliases = [];
+			for (name in Commands.names)
+				if (Commands.names[name] == i)
+					aliases.push(name);
+			msg += '<dt>' + '/' + aliases.join(', ') + '</dt>';
+			msg += '<dd>' + Commands.objects[i].descr + '</dd>';
+		}
 		msg += '</dl>';
 		Utils.message(user, msg);
 	}
@@ -305,56 +315,71 @@ Commands.add({
 		Utils.messageAll('<b style="color: ' +sys.getColor(user)+ '">***' + sys.name(user) + '</b> ' + param);
 	}
 });
-/*
-Commands.add('ghosts', access.user, 'Выкидывает пользователей с тем же IP. Если передан параметр, выкинет только польователя с этим ником.', function(user, param) {
-	var players = sys.playerIds();
-	var ip = sys.ip(user);
-	
-	if (param === undefined)
-		for (var i = players.length; i --> 0;)
-			if (sys.id(players[i]) != user && sys.ip(players[i]) == ip) {
-				Utils.message(user, sys.name(players[i]) + ' выкинут.');
-				sys.kick(players[i])
-			}
-	else
-		if (sys.ip(param) == ip)
-			sys.kick(sys.id(param));
-});
 
-
-Commands.add('whois', access.user, 'Информация о пользователе.', function(user, param) {
-	var id = sys.id(param);
-	var ip = sys.ip(param);
-	
-	if (id === undefined) {
-		Utils.message(user, 'Нет такого пользователя, "'+param+'".');
-		return;
-	}
-	
-	var s = '<table><tr><th><img src="avatar:' +sys.avatar(id)+ '"/></th><td>';
-	
-	s += 'Пользователь ' + param;
-	
-	if (sys.dbRegistered(id))
-		s += ' (зарегистирован)';
-	s += '<br>';
-	
-	s += 'Страна: ' + (SESSION.users(id).country || 'Неизвестно') + '<br>';
-	
-	if (sys.auth(user) > 0)
-		s += 'IP: ' + sys.ip(id) + ', id: ' +id+ '<br>';
-	
-	var aliases = sys.aliases(ip)
-	if (aliases.length)
-		s += 'Также известен как: ' + aliases.join(' ');
+Commands.add({
+	aliases: ['ghosts'],
+	access : access.user,
+	descr  : 'Выкидывает пользователей с тем же IP. Если передан параметр, выкинет только польователя с этим ником.',
+	func   : function(user, param) {
+		var players = sys.playerIds();
+		var ip = sys.ip(user);
 		
-	s += '</td></tr></table>';
-	
-	Utils.message(user, s);
+		if (param === undefined)
+			for (var i = players.length; i --> 0;)
+				if (sys.id(players[i]) != user && sys.ip(players[i]) == ip) {
+					Utils.message(user, sys.name(players[i]) + ' выкинут.');
+					sys.kick(players[i])
+				}
+		else
+			if (sys.ip(param) == ip)
+				sys.kick(sys.id(param));
+	}
 });
 
-Commands.add('log', access.user, 'Лог последних сообщений.', function(user, param) {
-	Log.print(user, parseInt(param));
-});*/
+
+Commands.add({
+	aliases: ['whois', 'ктобля'],
+	access : access.user,
+	descr  : 'Информация о пользователе.', 
+	func   : function(user, param) {
+		var id = sys.id(param);
+		var ip = sys.ip(param);
+		
+		if (id === undefined) {
+			Utils.message(user, 'Нет такого пользователя, "'+param+'".');
+			return;
+		}
+		
+		var s = '<table><tr><th><img src="avatar:' +sys.avatar(id)+ '"/></th><td>';
+		
+		s += 'Пользователь ' + param;
+		
+		if (sys.dbRegistered(id))
+			s += ' (зарегистирован)';
+		s += '<br>';
+		
+		s += 'Страна: ' + (SESSION.users(id).country || 'Неизвестно') + '<br>';
+		
+		if (sys.auth(user) > 0)
+			s += 'IP: ' + sys.ip(id) + ', id: ' +id+ '<br>';
+		
+		var aliases = sys.aliases(ip)
+		if (aliases.length)
+			s += 'Также известен как: ' + aliases.join(' ');
+			
+		s += '</td></tr></table>';
+		
+		Utils.message(user, s);
+	}
+});
+
+Commands.add({
+	aliases: ['log', 'лог'],
+	access : access.user,
+	descr  : 'Лог последних сообщений.',
+	func   : function(user, param) {
+		Log.print(user, parseInt(param));
+	}
+});
 
 Commands // eval will return this
