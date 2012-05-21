@@ -59,7 +59,7 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: ['mute', 'm'],
+	aliases: ['mute', 'm', 'м'],
 	access : access.moderator,
 	descr  : 'Лишает пользователя голоса.',
 	func   : function(mod, param) {
@@ -124,7 +124,7 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: ['tempban', 'b', 'б'],
+	aliases: ['tempban', 'b', 'б', 'бан'],
 	access : access.moderator,
 	descr  : 'Банит пользователя на некоторое время.', 
 	func   : function(mod, param) {
@@ -265,7 +265,7 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: ['commands'],
+	aliases: ['commands', 'help', 'команды', 'помощь'],
 	access : access.user,
 	descr  : 'Показывает все доступные команды.', 
 	func   : function(user, param) {	// вся "инкапсуляция" к чертям (
@@ -302,7 +302,7 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: ['me'],
+	aliases: ['me', 'я'],
 	access : access.user,
 	descr  : 'Сообщение в третьем лице.',
 	func   : function(user, param) {
@@ -377,14 +377,16 @@ Commands.add({
 });
 
 Commands.add({
-	aliases: ['kick', 'кик', 'k', 'к'],
+	aliases: ['kick', 'кик', 'k', 'к', 'идинахуй'],
 	access : access.moderator,
 	descr  : 'Выкидывает пользователя.', 
 	func   : function(mod, user) {
 		var id = sys.id(user);
 
-		if (id === undefined)
+		if (id === undefined) {
 			Utils.message(mod, 'Нет такого пользователя, "'+user+'".');
+			return;
+		}
 		
 		Utils.message(user, sys.name(mod) + ' выкинул вас.');
 		sys.kick(id);
