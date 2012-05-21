@@ -54,7 +54,7 @@ Commands.add({
 			Utils.message(user, "Ошибка: " + e);
 		}
 		if (res)
-			Utils.message(user, 'Команда вернула: ' + res);
+			Utils.message(user, 'Команда вернула: ' + JSON.stringify(res));
 	}
 });
 
@@ -373,6 +373,22 @@ Commands.add({
 	descr  : 'Лог последних сообщений.',
 	func   : function(user, param) {
 		Log.print(user, parseInt(param));
+	}
+});
+
+Commands.add({
+	aliases: ['kick', 'кик', 'k', 'к'],
+	access : access.moderator,
+	descr  : 'Выкидывает пользователя.', 
+	func   : function(mod, user) {
+		var id = sys.id(user);
+
+		if (id === undefined)
+			Utils.message(mod, 'Нет такого пользователя, "'+user+'".');
+		
+		Utils.message(user, sys.name(mod) + ' выкинул вас.');
+		sys.kick(id);
+		Utils.message(mod,  user + ' выкинут.');
 	}
 });
 

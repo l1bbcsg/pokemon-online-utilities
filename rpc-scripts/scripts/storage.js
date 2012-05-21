@@ -2,7 +2,6 @@ function Storage(filename) {
 	this.filename = filename;
 	this.elements = {};
 	this.separator = '=';
-	this.empty = "###########";
 	
 	this.init(filename);
 };
@@ -53,6 +52,10 @@ Storage.prototype.dump = function() {
 	for (var key in this.elements)
 		s += key + this.separator + this.elements[key] + '\n';
 	sys.writeToFile(this.filename, s);
+}
+
+Storage.prototype.exists = function(key) {
+	return this.elements.hasOwnProperty(key);
 }
 
 Storage
